@@ -11,6 +11,8 @@ import json
 import re
 import sys
 
+
+
 async def getUrl(init):
     if init == -1:
         url = "https://twitter.com/search?f=tweets&vertical=default&lang=en&q="
@@ -21,6 +23,9 @@ async def getUrl(init):
 
     if arg.u != None:
         url+= "from%3A{0.u}".format(arg)
+    if arg.g != None:
+        arg.g = arg.g.replace(" ", "")
+        url+= "geocode%3A{0.g}".format(arg)
     if arg.s != None:
         arg.s = arg.s.replace(" ", "%20").replace("#", "%23")
         url+= "%20{0.s}".format(arg)
@@ -66,14 +71,6 @@ async def getFeed(init):
 
     return feed, init
 
-async def getPic(url):
-    async with aiohttp.ClientSession() as session:
-        r = await fetch(session, url)
-    soup = BeautifulSoup(r, "html.parser")
-    picture = soup.find("div", "AdaptiveMedia-photoContainer js-adaptive-photo ")
-    if picture is not None:
-        return picture["data-image-url"].replace(" ", "")
-
 async def getTweets(init):
     tweets, init = await getFeed(init)
     count = 0
@@ -92,14 +89,6 @@ async def getTweets(init):
         replies = tweet.find("span", "ProfileTweet-action--reply u-hiddenVisually").find("span")["data-tweet-stat-count"]
         retweets = tweet.find("span", "ProfileTweet-action--retweet u-hiddenVisually").find("span")["data-tweet-stat-count"]
         likes = tweet.find("span", "ProfileTweet-action--favorite u-hiddenVisually").find("span")["data-tweet-stat-count"]
-        if arg.rawpic and "pic.twitter.com" in text:
-            try:
-                picture = await getPic("https://twitter.com/{0}/status/{1}/photo/1".format(username, tweetid))
-                if picture is not None:
-                    pic = re.findall(r"pic.twitter.com/\w+", text)[-1]
-                    text = text.replace(pic, picture)
-            except:
-                pass
         try:
             mentions = tweet.find("div", "js-original-tweet")["data-mentions"].split(" ")
             for i in range(len(mentions)):
@@ -183,6 +172,7 @@ if __name__ == "__main__":
     ap.add_argument("-u", help="User's Tweets you want to scrape.")
     ap.add_argument("-s", help="Search for Tweets containing this word or phrase.")
     ap.add_argument("-o", help="Save output to a file.")
+    ap.add_argument("-g", help="Search for geocoded tweets.")
     ap.add_argument("--year", help="Filter Tweets before specified year.")
     ap.add_argument("--since", help="Filter Tweets sent since date (Example: 2017-12-27).")
     ap.add_argument("--fruit", help="Display 'low-hanging-fruit' Tweets.", action="store_true")
@@ -195,10 +185,9 @@ if __name__ == "__main__":
     ap.add_argument("--limit", help="Number of Tweets to pull (Increments of 20).")
     ap.add_argument("--count", help="Display number Tweets scraped at the end of session.", action="store_true")
     ap.add_argument("--stats", help="Show number of replies, retweets, and likes", action="store_true")
-    ap.add_argument("--rawpic", help="Display raw picture URL (Slow).", action="store_true")
     arg = ap.parse_args()
 
     check()
 
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+loop.run_until_complete(main())
