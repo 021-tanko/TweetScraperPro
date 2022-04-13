@@ -93,8 +93,6 @@ async def getUrl(init):
         url+= "&lang=en&include_available_features=1&include_entities=1&reset_"
         url+= "error_state=false&src=typd&max_position={}&q=".format(init)
 
-    if arg.l != None:
-        url = url.replace("lang=en", "l={0.l}&lang=en".format(arg))
     if arg.u != None:
         url+= "from%3A{0.u}".format(arg)
     if arg.g != None:
@@ -116,10 +114,6 @@ async def getUrl(init):
         url+= "%20OR%20keybase"
     if arg.verified:
         url+= "%20filter%3Averified"
-    if arg.to:
-        url+= "%20to%3A{0.to}".format(arg)
-    if arg.all:
-        url+= "%20to%3A{0.all}%20OR%20from%3A{0.all}%20OR%20@{0.all}".format(arg)
 
     return url
 
@@ -419,6 +413,16 @@ async def main():
     Putting it all together.
     '''
 
+    if arg.until:
+        _until = datetime.datetime.strptime(arg.until, "%Y-%m-%d").date()
+    else:
+        _until = datetime.date.today()
+    
+    if arg.since:
+        _since = datetime.datetime.strptime(arg.since, "%Y-%m-%d").date()
+    else:
+        _since = datetime.datetime.strptime("2006-03-21", "%Y-%m-%d").date() # the 1st tweet
+
     if arg.elasticsearch:
         print("Indexing to Elasticsearch @ " + str(arg.elasticsearch))
 
@@ -436,7 +440,9 @@ async def main():
     feed = [-1]
     init = -1
     num = 0
-    while True:
+    while _since < _until:
+        arg.since = str(_until - datetime.timedelta(days=1))
+        arg.until = str(_until)
         '''
         If our response from getFeed() has an exception,
         it signifies there are no position IDs to continue
@@ -446,7 +452,9 @@ async def main():
             feed, init, count = await getTweets(init)
             num += count
         else:
-            break
+            print("update\n")
+            _until = _until - datetime.timedelta(days=1)
+            feed = [-1]
         # Control when we want to stop scraping.
         if arg.limit is not None and num >= int(arg.limit):
             break
@@ -493,7 +501,6 @@ if __name__ == "__main__":
     ap.add_argument("-u", help="User's Tweets you want to scrape.")
     ap.add_argument("-s", help="Search for Tweets containing this word or phrase.")
     ap.add_argument("-g", help="Search for geocoded tweets.")
-    ap.add_argument("-l", help="Serch for Tweets in a specific language")
     ap.add_argument("-o", help="Save output to a file.")
     ap.add_argument("-es", "--elasticsearch", help="Index to Elasticsearch")
     ap.add_argument("--year", help="Filter Tweets before specified year.")
@@ -511,8 +518,6 @@ if __name__ == "__main__":
     ap.add_argument("--count", help="Display number Tweets scraped at the end of session.", action="store_true")
     ap.add_argument("--stats", help="Show number of replies, retweets, and likes", action="store_true")
     ap.add_argument("--database", help="Store tweets in the database")
-    ap.add_argument("--to", help="Search Tweets to a user")
-    ap.add_argument("--all", help="Search all Tweets associated with a user") 
     arg = ap.parse_args()
 
     check()
