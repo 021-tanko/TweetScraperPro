@@ -314,11 +314,10 @@ async def outTweet(tweet):
     datestamp = tweet.find("a", "tweet-timestamp")["title"].rpartition(" - ")[-1]
     d = datetime.datetime.strptime(datestamp, "%d %b %Y")
     date = d.strftime("%Y-%m-%d")
-    if arg.since and arg.until:
-        if (d.date() - datetime.datetime.strptime(arg.since, "%Y-%m-%d").date()).days == -1:
-            if _since_def_user:
-                # mitigation here, maybe find something better
-                sys.exit(0)
+    if (d.date() - datetime.datetime.strptime(arg.since, "%Y-%m-%d").date()).days == -1:
+        if _since_def_user:
+            # mitigation here, maybe find something better
+            sys.exit(0)
     timestamp = str(datetime.timedelta(seconds=int(tweet.find("span", "_timestamp")["data-time"]))).rpartition(", ")[-1]
     t = datetime.datetime.strptime(timestamp, "%H:%M:%S")
     time = t.strftime("%H:%M:%S")
@@ -395,6 +394,24 @@ async def outTweet(tweet):
         nLikes = 0
         nReplies = 0
         nRetweets = 0
+
+        jObject = {
+            "tweetid": tweetid,
+            "datestamp": date + " " + time,
+            "timezone": timezone,
+            "text": text,
+            "hashtags": hashtags,
+            "username": username,
+            "day": _day,
+            "hour": time.split(":")[0]
+            }
+        j_data = {
+            "_index": "tweetscraperpro",
+            "_type": "items",
+            "_id": tweetid + "_raw",
+            "_source": jObject
+        }
+        actions.append(j_data)
 
         for l in range(int(likes)):
             jObject = {
@@ -677,7 +694,7 @@ async def main():
 
             if arg.limit is not None and num >= int(arg.limit):
                 break
-    elif arg.since and arg.until:
+    else:
         while _since < _until:
             arg.since = str(_until - datetime.timedelta(days=int(arg.timedelta)))
             arg.until = str(_until)
@@ -694,16 +711,6 @@ async def main():
                 feed = [-1]
 
             # Control when we want to stop scraping.
-            if arg.limit is not None and num >= int(arg.limit):
-                break
-    else:
-        while True:
-            if len(feed) > 0:
-                feed, init, count = await getTweets(init)
-                num += count
-            else:
-                break
-            
             if arg.limit is not None and num >= int(arg.limit):
                 break
 
