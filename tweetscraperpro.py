@@ -2,10 +2,13 @@
 '''
 TweetScraperPro.py - Twitter Intelligence (formerly known as TweetSpy).
 Written by 021 Tanko (@now)
+
 Special thanks to @hpiedcoq & @pielco11 for contributing
 several search and storing options.
+
 See wiki on Github for in-depth details.
 https://github.com/haccer/tweetscraperpro/wiki
+
 Licensed under MIT License
 Copyright (c) 2022 021 Tanko
 '''
