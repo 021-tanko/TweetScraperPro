@@ -17,6 +17,8 @@ PUT tweetscraperpro
         "day": {"type": "keyword"},
         "hour": {"type": "keyword"},
         "link": {"type": "text"},
+        "retweet": {"type": "text"},
+        "user_rt": {"type": "text"},
         "essid": {"type": "keyword"}
       }
     }
