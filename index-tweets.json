@@ -1,6 +1,6 @@
 PUT tweetscraperpro
 {
-  "mappings" : {
+  "mappings": {
     "items": {
       "properties": {
         "id": {"type": "long"},
