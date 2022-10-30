@@ -169,10 +169,13 @@ def main():
     elif args.followers:
         tweetscraperpro.run.Followers(c)
     elif args.retweets or args.profile_full:
-        _userlist = loadUserList(args.userlist, "profile")
-        for _user in _userlist:
-            args.username = _user
-            c = initialize(args)
+        if args.userlist:
+            _userlist = loadUserList(args.userlist, "profile")
+            for _user in _userlist:
+                args.username = _user
+                c = initialize(args)
+                tweetscraperpro.run.Profile(c)
+        else:
             tweetscraperpro.run.Profile(c)
     else:
         tweetscraperpro.run.Search(c)
