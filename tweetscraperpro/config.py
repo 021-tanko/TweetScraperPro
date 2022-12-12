@@ -43,3 +43,6 @@ class Config:
     Index_users = "tweetscraperproUser"
     Debug = False
     Resume = None
+    Images = False
+    Videos = False
+    Media = False
