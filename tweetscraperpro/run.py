@@ -1,4 +1,4 @@
-from . import datelock, feed, get, output, verbose, storage
+from . import datelock, feed, get, output, verbose
 from asyncio import get_event_loop
 from datetime import timedelta
 from .storage import db
@@ -15,9 +15,6 @@ class TweetScraperPro:
         self.conn = db.Conn(config.Database)
         self.d = datelock.Set(self.config.Until, self.config.Since)
         verbose.Elastic(config.Elasticsearch)
-
-        if self.config.Pandas_clean:
-            storage.panda.clean()
 
         if not self.config.Timedelta:
             if (self.d._until - self.d._since).days > 30:
@@ -81,7 +78,7 @@ class TweetScraperPro:
     async def main(self):
         if self.config.User_id is not None:
             self.config.Username = await get.Username(self.config.User_id)
-
+        
         if self.config.TwitterSearch and self.config.Since and self.config.Until:
             _days = timedelta(days=int(self.config.Timedelta))
             while self.d._since < self.d._until:
@@ -109,12 +106,12 @@ class TweetScraperPro:
                         await self.tweets()
                 else:
                     break
-
+            
                 if get.Limit(self.config.Limit, self.count):
                     break
-
+        
         if self.config.Count:
-            verbose.Count(self.count, self.config.Username)
+            verbose.Count(self.count, self.config)
 
 def run(config):
     get_event_loop().run_until_complete(TweetScraperPro(config).main())
