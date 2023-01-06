@@ -218,11 +218,32 @@ def main():
     c = initialize(args)
 
     if args.favorites:
-        tweetscraperpro.run.Favorites(c)
+        if args.userlist:
+            _userlist = loadUserList(args.userlist, "favorites")
+            for _user in _userlist:
+                args.username = _user
+                c = initialize(args)
+                tweetscraperpro.run.Favorites(c)
+        else:
+            tweetscraperpro.run.Favorites(c)
     elif args.following:
-        tweetscraperpro.run.Following(c)
+        if args.userlist:
+            _userlist = loadUserList(args.userlist, "following")
+            for _user in _userlist:
+                args.username = _user
+                c = initialize(args)
+                tweetscraperpro.run.Following(c)
+        else:
+            tweetscraperpro.run.Following(c)
     elif args.followers:
-        tweetscraperpro.run.Followers(c)
+        if args.userlist:
+            _userlist = loadUserList(args.userlist, "followers")
+            for _user in _userlist:
+                args.username = _user
+                c = initialize(args)
+                tweetscraperpro.run.Followers(c)
+        else:
+            tweetscraperpro.run.Followers(c)
     elif args.retweets or args.profile_full:
         if args.userlist:
             _userlist = loadUserList(args.userlist, "profile")
