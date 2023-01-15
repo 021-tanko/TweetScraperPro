@@ -41,6 +41,7 @@ class Config:
     Index_tweets = "tweetscraperpro"
     Index_follow = "tweetscraperproGraph"
     Index_users = "tweetscraperproUser"
+    Index_type = "items"
     Debug = False
     Resume = None
     Images = False
