@@ -38,9 +38,9 @@ class Config:
     Store_pandas = False
     Pandas_type = None
     Pandas = False
-    Index_tweets = "tweetscraperpro"
-    Index_follow = "tweetscraperproGraph"
-    Index_users = "tweetscraperproUser"
+    Index_tweets = "tweetscraperprotweets"
+    Index_follow = "tweetscraperprograph"
+    Index_users = "tweetscraperprouser"
     Index_type = "items"
     Debug = False
     Resume = None

@@ -1,4 +1,4 @@
-PUT tweetscraperpro
+PUT tweetscraperprotweets
 {
   "mappings": {
     "items": {
