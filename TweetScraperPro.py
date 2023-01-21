@@ -170,12 +170,12 @@ def options():
     ap.add_argument("--search_name",
                     help="Name for identify the search like -3dprinter stuff- only for mysql")
     ap.add_argument("-it", "--index-tweets",
-                    help="Custom Elasticsearch Index name for Tweets.", nargs="?", default="tweetscraperpro")
+                    help="Custom Elasticsearch Index name for Tweets.", nargs="?", default="tweetscraperprotweets")
     ap.add_argument("-if", "--index-follow",
                     help="Custom Elasticsearch Index name for Follows.",
-                    nargs="?", default="tweetscraperproGraph")
+                    nargs="?", default="tweetscraperprograph")
     ap.add_argument("-iu", "--index-users", help="Custom Elasticsearch Index name for Users.",
-                    nargs="?", default="tweetscraperproUser")
+                    nargs="?", default="tweetscraperprouser")
     ap.add_argument("--debug",
                     help="Store information in debug logs", action="store_true")
     ap.add_argument("--resume", help="Resume from Tweet ID.")
