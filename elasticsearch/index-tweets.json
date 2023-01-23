@@ -19,7 +19,11 @@ PUT tweetscraperprotweets
         "link": {"type": "text"},
         "retweet": {"type": "text"},
         "user_rt": {"type": "text"},
-        "essid": {"type": "keyword"}
+        "essid": {"type": "keyword"},
+        "nlikes": {"type": "integer"},
+        "nreplies": {"type": "integer"},
+        "nretweets": {"type": "integer"},
+        "search": {"type": "text"}
       }
     }
   }
