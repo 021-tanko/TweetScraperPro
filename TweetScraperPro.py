@@ -244,8 +244,15 @@ def main():
                 tweetscraperpro.run.Profile(c)
         else:
             tweetscraperpro.run.Profile(c)
-    elif args.user_full and args.username:
-        tweetscraperpro.run.Lookup(c)
+    elif args.user_full:
+        if args.userlist:
+            _userlist = loadUserList(args.userlist, "userlist")
+            for _user in _userlist:
+                args.username = _user
+                c = initialize(args)
+                tweetscraperpro.run.Lookup(c)
+        else:
+            tweetscraperpro.run.Lookup(c)
     else:
         tweetscraperpro.run.Search(c)
 
