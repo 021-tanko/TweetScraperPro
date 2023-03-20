@@ -44,6 +44,7 @@ class Config:
     Index_users = "tweetscraperprouser"
     Index_type = "items"
     Debug = False
+    Retries_count = 10
     Resume = None
     Images = False
     Videos = False
