@@ -11,7 +11,10 @@ Copyright (c) 2022 021 Tanko
 import sys
 import os
 import argparse
-import tweetscraperpro
+
+from . import run
+from . import config
+from . import storage
 
 def error(_error, message):
     """ Print errors to stdout
@@ -55,7 +58,7 @@ def loadUserList(ul, _type):
 def initialize(args):
     """ Set default values for config from args
     """
-    c = tweetscraperpro.Config()
+    c = config.Config()
     c.Username = args.username
     c.User_id = args.userid
     c.Search = args.search
@@ -108,7 +111,7 @@ def initialize(args):
 def options():
     """ Parse arguments
     """
-    ap = argparse.ArgumentParser(prog="TweetScraperPro.py",
+    ap = argparse.ArgumentParser(prog="tweetscraperpro",
                                  usage="python3 %(prog)s [options]",
                                  description="TWEETSCRAPERPRO - An Advanced Twitter Scraping Tool.")
     ap.add_argument("-u", "--username", help="User's Tweets you want to scrape.")
@@ -193,7 +196,7 @@ def main():
     check(args)
 
     if args.pandas_clean:
-        tweetscraperpro.storage.panda.clean()
+        storage.panda.clean()
 
     c = initialize(args)
 
@@ -201,7 +204,7 @@ def main():
         c.Query = loadUserList(args.userlist, "search")
 
     if args.pandas_clean:
-        tweetscraperpro.storage.panda.clean()
+        storage.panda.clean()
 
     if args.favorites:
         if args.userlist:
@@ -209,49 +212,49 @@ def main():
             for _user in _userlist:
                 args.username = _user
                 c = initialize(args)
-                tweetscraperpro.run.Favorites(c)
+                run.Favorites(c)
         else:
-            tweetscraperpro.run.Favorites(c)
+            run.Favorites(c)
     elif args.following:
         if args.userlist:
             _userlist = loadUserList(args.userlist, "following")
             for _user in _userlist:
                 args.username = _user
                 c = initialize(args)
-                tweetscraperpro.run.Following(c)
+                run.Following(c)
         else:
-            tweetscraperpro.run.Following(c)
+            run.Following(c)
     elif args.followers:
         if args.userlist:
             _userlist = loadUserList(args.userlist, "followers")
             for _user in _userlist:
                 args.username = _user
                 c = initialize(args)
-                tweetscraperpro.run.Followers(c)
+                run.Followers(c)
         else:
-            tweetscraperpro.run.Followers(c)
+            run.Followers(c)
     elif args.retweets or args.profile_full:
         if args.userlist:
             _userlist = loadUserList(args.userlist, "profile")
             for _user in _userlist:
                 args.username = _user
                 c = initialize(args)
-                tweetscraperpro.run.Profile(c)
+                run.Profile(c)
         else:
-            tweetscraperpro.run.Profile(c)
+            run.Profile(c)
     elif args.user_full:
         if args.userlist:
             _userlist = loadUserList(args.userlist, "userlist")
             for _user in _userlist:
                 args.username = _user
                 c = initialize(args)
-                tweetscraperpro.run.Lookup(c)
+                run.Lookup(c)
         else:
-            tweetscraperpro.run.Lookup(c)
+            run.Lookup(c)
     else:
-        tweetscraperpro.run.Search(c)
+        run.Search(c)
 
-if __name__ == "__main__":
+def run_as_command():
     version = ".".join(str(v) for v in sys.version_info[:2])
     if float(version) < 3.6:
         print("[-] TWEETSCRAPERPRO requires Python version 3.6+.")

@@ -42,6 +42,11 @@ setup(
 	python_requires=REQUIRES_PYTHON,
 	url=URL,
 	packages=['tweetscraperpro', 'tweetscraperpro.storage'],
+	entry_points={
+		'console_scripts':[
+			'tweetscraperpro = tweetscraperpro.cli:run_as_command',
+		],
+	},
 	install_requires=REQUIRED,
 	license='MIT',
 	classifiers=[
