@@ -1,18 +1,20 @@
-import sys
+import sys, os
 from asyncio import get_event_loop, TimeoutError
 from datetime import timedelta, datetime
 
 from . import datelock, feed, get, output, verbose, storage
 from .storage import db
-from . import _logme
+#from . import _logme
+#
+#logme = _logme._logger(__name__)
 
-logme = _logme._logger(__name__)
+import logging as logme
 
 class TweetScraperPro:
     def __init__(self, config):
-        logme.debug('TweetScraperPro:__init__')
+        logme.debug(__name__+':TweetScraperPro:__init__')
         if config.Resume is not None and config.TwitterSearch:
-            logme.debug('TweetScraperPro:__init__:Resume')
+            logme.debug(__name__+':TweetScraperPro:__init__:Resume')
             self.init = f"TWEET-{config.Resume}-0"
         else:
             self.init = -1
@@ -26,23 +28,23 @@ class TweetScraperPro:
         verbose.Elastic(config.Elasticsearch)
 
         if self.config.Store_object:
-            logme.debug('TweetScraperPro:__init__:clean_follow_list')
+            logme.debug(__name__+':TweetScraperPro:__init__:clean_follow_list')
             output.clean_follow_list()
 
         if self.config.Pandas_clean:
-            logme.debug('TweetScraperPro:__init__:pandas_clean')
+            logme.debug(__name__+':TweetScraperPro:__init__:pandas_clean')
             storage.panda.clean()
 
         if not self.config.Timedelta:
             if (self.d._until - self.d._since).days > 30:
                 self.config.Timedelta = 30
-                logme.debug('TweetScraperPro:__init__:timedelta_fixed')
+                logme.debug(__name__+':TweetScraperPro:__init__:timedelta_fixed')
             else:
-                logme.debug('TweetScraperPro:__init__:timedelta_unfixed')
+                logme.debug(__name__+':TweetScraperPro:__init__:timedelta_unfixed')
                 self.config.Timedelta = (self.d._until - self.d._since).days
 
     async def Feed(self):
-        logme.debug('TweetScraperPro:Feed')
+        logme.debug(__name__+':TweetScraperPro:Feed')
         consecutive_errors_count = 0
         while True:
             response = await get.RequestUrl(self.config, self.init, headers=[("User-Agent", self.user_agent)])
@@ -67,7 +69,7 @@ class TweetScraperPro:
                 if self.config.Proxy_host.lower() == "tor":
                     print("[?] Timed out, changing Tor identity...")
                     if self.config.Tor_control_password is None:
-                        logme.critical('TweetScraperPro:Feed:tor-password')
+                        logme.critical(__name__+':TweetScraperPro:Feed:tor-password')
                         sys.stderr.write("Error: config.Tor_control_password must be set for proxy autorotation!\r\n")
                         sys.stderr.write("Info: What is it? See https://stem.torproject.org/faq.html#can-i-interact-with-tors-controller-interface-directly\r\n")
                         break
@@ -75,17 +77,17 @@ class TweetScraperPro:
                         get.ForceNewTorIdentity(self.config)
                         continue
                 else:
-                    logme.critical('TweetScraperPro:Feed:' + str(e))
+                    logme.critical(__name__+':TweetScraperPro:Feed:' + str(e))
                     print(str(e))
                     break
             except Exception as e:
-                logme.critical('TweetScraperPro:Feed:noData' + str(e))
+                logme.critical(__name__+':TweetScraperPro:Feed:noData' + str(e))
                 # Sometimes Twitter says there is no data. But it's a lie.
                 consecutive_errors_count += 1
                 if consecutive_errors_count < self.config.Retries_count:
                     self.user_agent = await get.RandomUserAgent()
                     continue
-                logme.critical('TweetScraperPro:Feed:Tweets_known_error:' + str(e))
+                logme.critical(__name__+':TweetScraperPro:Feed:Tweets_known_error:' + str(e))
                 print(str(e) + " [x] run.Feed")
                 print("[!] if get this error but you know for sure that more tweets exist, please open an issue and we will investigate it!")
                 break
@@ -93,27 +95,27 @@ class TweetScraperPro:
     async def follow(self):
         await self.Feed()
         if self.config.User_full:
-            logme.debug('TweetScraperPro:follow:userFull')
+            logme.debug(__name__+':TweetScraperPro:follow:userFull')
             self.count += await get.Multi(self.feed, self.config, self.conn)
         else:
-            logme.debug('TweetScraperPro:follow:notUserFull')
+            logme.debug(__name__+':TweetScraperPro:follow:notUserFull')
             for user in self.feed:
                 self.count += 1
                 username = user.find("a")["name"]
                 await output.Username(username, self.config, self.conn)
 
     async def favorite(self):
-        logme.debug('TweetScraperPro:favorite')
+        logme.debug(__name__+':TweetScraperPro:favorite')
         await self.Feed()
         self.count += await get.Multi(self.feed, self.config, self.conn)
 
     async def profile(self):
         await self.Feed()
         if self.config.Profile_full:
-            logme.debug('TweetScraperPro:profileFull')
+            logme.debug(__name__+':TweetScraperPro:profileFull')
             self.count += await get.Multi(self.feed, self.config, self.conn)
         else:
-            logme.debug('TweetScraperPro:notProfileFull')
+            logme.debug(__name__+':TweetScraperPro:notProfileFull')
             for tweet in self.feed:
                 self.count += 1
                 await output.Tweets(tweet, "", self.config, self.conn)
@@ -121,10 +123,10 @@ class TweetScraperPro:
     async def tweets(self):
         await self.Feed()
         if self.config.Location:
-            logme.debug('TweetScraperPro:tweets:location')
+            logme.debug(__name__+':TweetScraperPro:tweets:location')
             self.count += await get.Multi(self.feed, self.config, self.conn)
         else:
-            logme.debug('TweetScraperPro:tweets:notLocation')
+            logme.debug(__name__+':TweetScraperPro:tweets:notLocation')
             for tweet in self.feed:
                 self.count += 1
                 await output.Tweets(tweet, "", self.config, self.conn)
@@ -132,16 +134,16 @@ class TweetScraperPro:
     async def main(self):
         self.user_agent = await get.RandomUserAgent()
         if self.config.User_id is not None:
-            logme.debug('TweetScraperPro:main:user_id')
+            logme.debug(__name__+':TweetScraperPro:main:user_id')
             self.config.Username = await get.Username(self.config.User_id)
 
         if self.config.Username is not None:
-            logme.debug('TweetScraperPro:main:username')
+            logme.debug(__name__+':TweetScraperPro:main:username')
             url = f"http://twitter.com/{self.config.Username}?lang=en"
             self.config.User_id = await get.User(url, self.config, self.conn, True)
 
         if self.config.TwitterSearch and self.config.Since and self.config.Until:
-            logme.debug('TweetScraperPro:main:search+since+until')
+            logme.debug(__name__+':TweetScraperPro:main:search+since+until')
             _days = timedelta(days=int(self.config.Timedelta))
             while self.d._since < self.d._until:
                 self.config.Since = str(self.d._until - _days)
@@ -149,7 +151,7 @@ class TweetScraperPro:
                 if len(self.feed) > 0:
                     await self.tweets()
                 else:
-                    logme.debug('TweetScraperPro:main:gettingNewTweets')
+                    logme.debug(__name__+':TweetScraperPro:main:gettingNewTweets')
                     self.d._until = self.d._until - _days
                     self.feed = [-1]
 
@@ -157,44 +159,44 @@ class TweetScraperPro:
                     self.d._until = self.d._until - _days
                     self.feed = [-1]
         else:
-            logme.debug('TweetScraperPro:main:not-search+since+until')
+            logme.debug(__name__+':TweetScraperPro:main:not-search+since+until')
             while True:
                 if len(self.feed) > 0:
                     if self.config.Followers or self.config.Following:
-                        logme.debug('TweetScraperPro:main:follow')
+                        logme.debug(__name__+':TweetScraperPro:main:follow')
                         await self.follow()
                     elif self.config.Favorites:
-                        logme.debug('TweetScraperPro:main:favorites')
+                        logme.debug(__name__+':TweetScraperPro:main:favorites')
                         await self.favorite()
                     elif self.config.Profile:
-                        logme.debug('TweetScraperPro:main:profile')
+                        logme.debug(__name__+':TweetScraperPro:main:profile')
                         await self.profile()
                     elif self.config.TwitterSearch:
-                        logme.debug('TweetScraperPro:main:twitter-search')
+                        logme.debug(__name__+':TweetScraperPro:main:twitter-search')
                         await self.tweets()
                 else:
-                    logme.debug('TweetScraperPro:main:no-more-tweets')
+                    logme.debug(__name__+':TweetScraperPro:main:no-more-tweets')
                     break
 
                 #logging.info("[<] " + str(datetime.now()) + ':: run+TweetScraperPro+main+CallingGetLimit2')
                 if get.Limit(self.config.Limit, self.count):
-                    logme.debug('TweetScraperPro:main:reachedLimit')
+                    logme.debug(__name__+':TweetScraperPro:main:reachedLimit')
                     break
 
         if self.config.Count:
             verbose.Count(self.count, self.config)
 
 def run(config):
-    logme.debug('run')
+    logme.debug(__name__+':run')
     get_event_loop().run_until_complete(TweetScraperPro(config).main())
 
 def Favorites(config):
-    logme.debug('Favorites')
+    logme.debug(__name__+':Favorites')
     config.Favorites = True
     run(config)
 
 def Followers(config):
-    logme.debug('Followers')
+    logme.debug(__name__+':Followers')
     output.clean_follow_list()
     config.Followers = True
     config.Following = False
@@ -207,7 +209,7 @@ def Followers(config):
         storage.panda.clean()
 
 def Following(config):
-    logme.debug('Following')
+    logme.debug(__name__+':Following')
     output.clean_follow_list()
     config.Following = True
     config.Followers = False
@@ -220,17 +222,17 @@ def Following(config):
         storage.panda.clean()
 
 def Lookup(config):
-    logme.debug('Lookup')
+    logme.debug(__name__+':Lookup')
     url = f"http://twitter.com/{config.Username}?lang=en"
     get_event_loop().run_until_complete(get.User(url, config, db.Conn(config.Database)))
 
 def Profile(config):
-    logme.debug('Profile')
+    logme.debug(__name__+':Profile')
     config.Profile = True
     run(config)
 
 def Search(config):
-    logme.debug('Search')
+    logme.debug(__name__+':Search')
     config.TwitterSearch = True
     config.Following = False
     config.Followers = False
