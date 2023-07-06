@@ -13,14 +13,11 @@ import logging as logme
 class TweetScraperPro:
     def __init__(self, config):
         logme.debug(__name__+':TweetScraperPro:__init__')
-        if config.Resume is not None and config.TwitterSearch:
+        if config.Resume is not None and (config.TwitterSearch or config.Followers or config.Following):
             logme.debug(__name__+':TweetScraperPro:__init__:Resume')
-            self.init = f"{self.get_resume(config.Resume)}"
+            self.init = self.get_resume(config.Resume)
         else:
             self.init = -1
-
-        if config.Resume is not None and (config.Followers or config.Following):
-            self.init = self.get_resume(config.Resume)
             
         self.feed = [-1]
         self.count = 0
