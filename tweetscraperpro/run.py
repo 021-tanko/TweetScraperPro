@@ -58,6 +58,9 @@ class TweetScraperPro:
             if self.config.Debug:
                 print(response, file=open("tweetscraperpro-last-request.log", "w", encoding="utf-8"))
 
+            if self.config.Resume:
+                print(self.init, file=open(self.config.Resume, "w", encoding="utf-8"))
+                
             self.feed = []
             try:
                 if self.config.Favorites:
@@ -71,8 +74,6 @@ class TweetScraperPro:
                         self.feed, self.init = feed.profile(response)
                 elif self.config.TwitterSearch:
                     self.feed, self.init = feed.Json(response)
-                if self.config.Resume:
-                    print(self.init, file=open(self.config.Resume, "w", encoding="utf-8"))
                 break
             except TimeoutError as e:
                 if self.config.Proxy_host.lower() == "tor":
