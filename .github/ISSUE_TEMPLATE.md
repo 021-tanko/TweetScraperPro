@@ -7,7 +7,7 @@ Please use this template!
 >Make sure you've checked the following:
 
 - [] Python version is 3.6;
-- [] Updated TweetScraperPro with `pip3 install --upgrade -e git+https://github.com/021-tanko/tweetscraperpro.git@origin/master#egg=tweetscraperpro`;
+- [] Updated TweetScraperPro with `pip3 install --user --upgrade -e git+https://github.com/021-tanko/tweetscraperpro.git@origin/master#egg=tweetscraperpro`;
 - [] I have searched the issues and there are no duplicates of this issue/question/request.
 
 ### Command Ran
