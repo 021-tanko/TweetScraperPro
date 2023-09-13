@@ -1,3 +1,38 @@
+#!/usr/bin/python3
+from setuptools import setup
+import io
+import os
+import sys
+
+# Package meta-data
+NAME = 'tweetscraperpro'
+DESCRIPTION = 'An advanced Twitter scraping & TANKO tool.'
+URL = 'https://github.com/021-tanko/tweetscraperpro'
+EMAIL = 'aisynclab@gmail.com'
+AUTHOR = '021 Tanko'
+REQUIRES_PYTHON = '>=3.6.0'
+VERSION = None
+
+# Packages required
+REQUIRED = [
+		'aiohttp', 'aiodns', 'beautifulsoup4', 'cchardet', 
+                'elasticsearch', 'pysocks', 'pandas', 'aiohttp_socks',
+		'schedule', 'geopy', 'fake-useragent'
+		]
+
+here = os.path.abspath(os.path.dirname(__file__))
+
+with io.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
+	long_description = '\n' + f.read()
+
+# Load the package's __version__.py
+about = {}
+if not VERSION:
+	with open(os.path.join(here, NAME, '__version__.py')) as f:
+		exec(f.read(), about)
+else:
+	about['__version__'] = VERSION
+
 setup(
 	name=NAME,
 	version=about['__version__'],
