@@ -2,9 +2,12 @@
 __pycache__/
 *.py[cod]
 *$py.class
-
+tweets.db
 # C extensions
 *.so
+
+config.ini
+tweetscraperpro/storage/mysql.py
 
 # Node Dependency directories
 node_modules/
