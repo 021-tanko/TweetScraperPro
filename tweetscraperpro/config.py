@@ -43,7 +43,6 @@ class Config:
     Index_tweets = "tweetscraperprotweets"
     Index_follow = "tweetscraperprograph"
     Index_users = "tweetscraperprouser"
-    Debug = False
     Retries_count = 10
     Resume = None
     Images = False
