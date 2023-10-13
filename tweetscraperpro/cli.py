@@ -11,7 +11,6 @@ Copyright (c) 2022 The TweetScraperPro Project
 import sys
 import os
 import argparse
-from datetime import timedelta
 
 from . import run
 from . import config
@@ -63,12 +62,6 @@ def loadUserList(ul, _type):
     return userlist
 
 
-def getTimeDelta(arg):
-    if arg:
-        return timedelta(days=int(arg))
-    return None
-
-
 def initialize(args):
     """ Set default values for config from args
     """
@@ -82,7 +75,6 @@ def initialize(args):
     c.Lang = args.lang
     c.Output = args.output
     c.Elasticsearch = args.elasticsearch
-    c.Timedelta = getTimeDelta(args.timedelta)
     c.Year = args.year
     c.Since = args.since
     c.Until = args.until
@@ -131,8 +123,6 @@ def initialize(args):
     c.Source = args.source
     c.Members_list = args.members_list
     c.Filter_retweets = args.filter_retweets
-    c.Translate = args.translate
-    c.TranslateDest = args.translate_dest
     return c
 
 def options():
@@ -149,7 +139,6 @@ def options():
     ap.add_argument("-l", "--lang", help="Search for Tweets in a specific language.")
     ap.add_argument("-o", "--output", help="Save output to a file.")
     ap.add_argument("-es", "--elasticsearch", help="Index to Elasticsearch.")
-    ap.add_argument("-t", "--timedelta", help="Time interval for every request.")
     ap.add_argument("--year", help="Filter Tweets before specified year.")
     ap.add_argument("--since", help="Filter Tweets sent since date (Example: \"2017-12-27 20:30:15\" or 2017-12-27).",
                     metavar="DATE")
@@ -192,14 +181,11 @@ def options():
     ap.add_argument("--profile-full",
                     help="Slow, but effective method of collecting a user's Tweets and RT.",
                     action="store_true")
-    ap.add_argument("--translate",
-                    help="Get tweets translated by Google Translate.",
-                    action="store_true")
-    ap.add_argument("--translate-dest", help="Translate tweet to language (ISO2).",
-                    default="en")
     ap.add_argument("--store-pandas", help="Save Tweets in a DataFrame (Pandas) file.")
     ap.add_argument("--pandas-type",
                     help="Specify HDF5 or Pickle (HDF5 as default)", nargs="?", default="HDF5")
+    ap.add_argument("--search_name",
+                    help="Name for identify the search like -3dprinter stuff- only for mysql")
     ap.add_argument("-it", "--index-tweets",
                     help="Custom Elasticsearch Index name for Tweets.", nargs="?", default="tweetscraperprotweets")
     ap.add_argument("-if", "--index-follow",
